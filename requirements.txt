@@ -1,0 +1,10 @@
+# Data pipeline dependencies (Diego — Data role). Python 3.11.
+roboflow>=1.1.0          # dataset download via SDK
+ultralytics>=8.4.0       # YOLO26 (introduced in 8.4.0); YOLO format helpers — shared with Coder 1
+opencv-python>=4.9.0     # image IO / resize
+numpy>=1.26
+pillow>=10.0             # EXIF / rotation fixes
+pyyaml>=6.0              # config + data.yaml
+imagehash>=4.3           # perceptual-hash dedupe
+scikit-learn>=1.4        # stratified splitting
+tqdm>=4.66               # progress bars
