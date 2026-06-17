@@ -13,7 +13,7 @@ The pose and combined logic is an applied extension and the demo wow factor.
 
 ## Tech stack
 - Python 3.11.
-- Ultralytics YOLO (YOLOv11), Roboflow SDK, OpenCV, NumPy.
+- Ultralytics YOLO (YOLOv26), Roboflow SDK, OpenCV, NumPy.
 - Training in Google Colab (GPU). Inference and the demo on a laptop.
 - Capture on phones, with a tripod for the demo clip.
 
