@@ -216,3 +216,22 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ── Project: dataset artifacts (large; versioned in Roboflow, not git) ────────
+# Keep the directory structure (.gitkeep) but ignore the heavy contents.
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/custom/incoming/*
+!data/custom/incoming/.gitkeep
+
+# Frozen detector weights (one agreed location; shared via Drive, not git)
+models/*.pt
+
+# Demo footage / rendered videos
+demo/*.mp4
+demo/*.mov
+demo/*.avi
