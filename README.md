@@ -123,8 +123,8 @@ section, polishes the notebook README, and assembles the final deck with the dem
 ## Handoffs
 | From | To | What | When |
 |---|---|---|---|
-| Diego | Coder 1 | Dataset export + data card | End of week 1 |
-| Coder 1 | Coder 2 | Frozen weights (`best.pt`) | Early week 2 |
-| Coder 1 | Presenter 2 | Metrics + plots | Early/mid week 2 |
-| Coder 2 | Presenters | Rendered demo + fallback video | Mid/late week 2 |
-| Presenter 1 | Presenter 2 | Narrative slides for assembly | Late week 2 |
+| Diego | Jan | Dataset export + data card | End of week 1 |
+| Jan | Ignacio | Frozen weights (`best.pt`) | Early week 2 |
+| Jan | Dalton | Metrics + plots | Early/mid week 2 |
+| Ignacio | Presenters | Rendered demo + fallback video | Mid/late week 2 |
+| Claudia | Dalton | Narrative slides for assembly | Late week 2 |
