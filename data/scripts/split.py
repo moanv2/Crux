@@ -64,8 +64,10 @@ def run(cfg: dict[str, Any], paths: Paths) -> Path:
         raise RuntimeError(f"No image/label pairs under {paths.interim_dir}/images. Run clean first.")
 
     splits = split_pairs(pairs, ratios, s["seed"])
-    if paths.processed_dir.exists():
-        shutil.rmtree(paths.processed_dir)  # clear stale output so re-runs can't leak across splits
+    for _name in splits:  # clear stale split contents (no leakage on re-run); keep processed/ + .gitkeep
+        _d = paths.processed_dir / _name
+        if _d.exists():
+            shutil.rmtree(_d)
     for name, items in splits.items():
         img_out = paths.processed_dir / name / "images"
         lbl_out = paths.processed_dir / name / "labels"
