@@ -216,3 +216,28 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# ── Project: dataset artifacts (kept OUT of git — so no git LFS is ever needed) ──
+# Images live in Roboflow + these dirs; git only tracks scripts + data.yaml +
+# data_card.md (text). Keep the dir structure (.gitkeep) but ignore the contents.
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/custom/incoming/*
+!data/custom/incoming/.gitkeep
+
+# Frozen detector weights (shared via Drive, not git)
+models/*.pt
+
+# Demo footage / rendered videos
+demo/*.mp4
+demo/*.mov
+demo/*.avi
+
+# Generated dataset artifacts (regenerated per-environment by export.py / stats.py;
+# data.yaml carries an absolute path, so it must not be committed)
+data/data.yaml
+data/data_card.md
