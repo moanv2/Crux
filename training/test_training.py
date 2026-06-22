@@ -68,3 +68,21 @@ def test_metrics_to_markdown_has_table_and_gain_row():
     assert "Fine-tuned (best.pt)" in md
     assert "0.8500" in md
     assert "Δ (gain)" in md
+
+
+def _write_data_yaml(tmp_path, has_test: bool):
+    ds = tmp_path / "ds"
+    (ds / "val" / "images").mkdir(parents=True)
+    if has_test:
+        (ds / "test" / "images").mkdir(parents=True)
+    yml = tmp_path / "data.yaml"
+    yml.write_text(f"path: {ds}\ntrain: train/images\nval: val/images\n")
+    return str(yml)
+
+
+def test_report_split_prefers_test_when_present(tmp_path):
+    assert eval_mod.report_split(_write_data_yaml(tmp_path, has_test=True)) == "test"
+
+
+def test_report_split_falls_back_to_val_when_no_test(tmp_path):
+    assert eval_mod.report_split(_write_data_yaml(tmp_path, has_test=False)) == "val"

@@ -80,6 +80,15 @@ def run(cfg: dict, paths: Paths):
     best = Path(results.save_dir) / "weights" / "best.pt"
     paths.weights.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(best, paths.weights)
+
+    # Training curves (results.png) are written by train(), not val() — export them here so
+    # eval.py's val-figure copy doesn't need the train run dir, and Dalton gets the curves.
+    artifacts = paths.root / "training" / "artifacts"
+    artifacts.mkdir(parents=True, exist_ok=True)
+    curves = Path(results.save_dir) / "results.png"
+    if curves.exists():
+        shutil.copy2(curves, artifacts / "results.png")
+
     logger.info("Training done. Frozen weights -> %s", paths.weights)
     return paths.weights
 
