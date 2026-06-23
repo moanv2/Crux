@@ -20,13 +20,24 @@ python training/train.py             # reads config.yaml: training.model/epochs/
 
 ## Evaluate
 ```bash
-python training/eval.py              # mAP50, mAP50-95 (+ PR curve, confusion matrix, sample grid)
+python training/eval.py              # before/after baseline + mAP50/mAP50-95 + figures
 ```
+Vals `models/best.pt` **and** the COCO-pretrained baseline on the same `data.yaml`, then
+writes `training/artifacts/metrics.json` + `metrics.md` (the handoff record for Dalton) and
+copies the PR curve / confusion matrix / sample predictions there. `eval.run()` also returns
+the before/after summary dict the notebook charts. The COCO baseline scores ≈0 mAP — it has
+no `hold` class — which is exactly the transfer-learning gain we report.
 
-## The graded notebook
-Lead with the **transfer-learning story**: COCO-pretrained baseline → fine-tuned on
-`data.yaml` → before/after mAP. Build the Colab notebook around `train.py` + `eval.py`
-so the narrative (dataset → fine-tune → eval → inference) reads top-to-bottom.
+## The graded notebook — `training/train_holds.ipynb`
+Thin: imports `train.py` / `eval.py`, reads `config.yaml`, leads with the transfer-learning
+story. Flow top-to-bottom: dataset → COCO baseline (≈0 mAP) → fine-tune → eval → before/after
+→ inference. Run on **Colab (GPU)**.
+
+## Tests
+```bash
+pytest training/test_training.py -v  # torch-free: augmentation mapping + metrics formatting
+```
+These import `ultralytics` lazily, so they pass with no GPU/torch (local sanity before Colab).
 
 ## Handoffs
 - `models/best.pt` → **Ignacio**.

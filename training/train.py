@@ -21,6 +21,48 @@ from config import Paths, load_config, resolve_paths  # noqa: E402
 logger = logging.getLogger(__name__)
 
 
+def _device() -> str:
+    """Pick a device that works on Colab (CUDA), Apple Silicon (MPS), or CPU."""
+    try:
+        import torch
+    except ImportError:
+        return "cpu"
+    if torch.cuda.is_available():
+        return "0"
+    if getattr(torch.backends, "mps", None) and torch.backends.mps.is_available():
+        return "mps"
+    return "cpu"
+
+
+def build_train_kwargs(cfg: dict, paths: Paths) -> dict:
+    """Translate config.yaml into Ultralytics ``model.train()`` keyword arguments.
+
+    Pure + torch-free (bar the device probe) so it is unit-testable without a GPU. Diego
+    sets the augmentation recipe in ``config.yaml augmentation:`` and we apply it here (the
+    Roboflow export has no baked-in augmentation). Ultralytics has no literal "brightness"
+    knob — HSV-value (``hsv_v``) is the standard proxy.
+    """
+    t = cfg["training"]
+    aug = cfg.get("augmentation", {})
+    return {
+        "data": str(paths.data_yaml),
+        "imgsz": cfg["image_size"],
+        "epochs": t.get("epochs", 80),
+        "batch": t.get("batch", 16),
+        "lr0": t.get("lr0", 0.01),
+        "patience": t.get("patience", 20),
+        "seed": t.get("seed", 42),
+        "deterministic": True,
+        "project": str(paths.root / "training" / "runs"),
+        "name": "finetune",
+        "device": _device(),
+        "fliplr": aug.get("fliplr", 0.5),
+        "flipud": aug.get("flipud", 0.0),
+        "hsv_v": aug.get("brightness", 0.2),   # brightness ≈ HSV value
+        "degrees": aug.get("rotation_deg", 10),
+    }
+
+
 def run(cfg: dict, paths: Paths):
     """Fine-tune and freeze weights to models/best.pt."""
     t = cfg["training"]
@@ -31,20 +73,22 @@ def run(cfg: dict, paths: Paths):
     except ImportError as exc:
         raise RuntimeError("ultralytics not installed — pip install ultralytics") from exc
 
+    kwargs = build_train_kwargs(cfg, paths)
     model = YOLO(t.get("model", "yolo26n.pt"))
-    results = model.train(
-        data=str(paths.data_yaml),
-        imgsz=cfg["image_size"],
-        epochs=t.get("epochs", 80),
-        batch=t.get("batch", 16),
-        lr0=t.get("lr0", 0.01),
-        patience=t.get("patience", 20),
-        seed=t.get("seed", 42),
-    )
+    results = model.train(**kwargs)
 
     best = Path(results.save_dir) / "weights" / "best.pt"
     paths.weights.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(best, paths.weights)
+
+    # Training curves (results.png) are written by train(), not val() — export them here so
+    # eval.py's val-figure copy doesn't need the train run dir, and Dalton gets the curves.
+    artifacts = paths.root / "training" / "artifacts"
+    artifacts.mkdir(parents=True, exist_ok=True)
+    curves = Path(results.save_dir) / "results.png"
+    if curves.exists():
+        shutil.copy2(curves, artifacts / "results.png")
+
     logger.info("Training done. Frozen weights -> %s", paths.weights)
     return paths.weights
 
