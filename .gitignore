@@ -249,3 +249,6 @@ training/artifacts/*
 !training/artifacts/.gitkeep
 !training/artifacts/metrics.json
 !training/artifacts/metrics.md
+
+# macOS junk
+.DS_Store
