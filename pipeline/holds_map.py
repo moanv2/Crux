@@ -20,11 +20,32 @@ from config import Paths, load_config, resolve_paths  # noqa: E402
 logger = logging.getLogger(__name__)
 
 
-def build_hold_map(empty_frame: Path, weights: Path, imgsz: int) -> list[dict]:
-    """Detect holds on the empty-wall frame → [{"xyxy": [...], "conf": float}, ...]."""
-    # TODO: from ultralytics import YOLO; r = YOLO(str(weights))(str(empty_frame), imgsz=imgsz)[0]
-    #       return [{"xyxy": b.xyxy[0].tolist(), "conf": float(b.conf)} for b in r.boxes]
-    raise NotImplementedError
+def build_hold_map(empty_frame: Path, weights: Path, imgsz: int, conf: float = 0.25) -> list[dict]:
+    """Detect holds on the empty-wall frame → ``[{"xyxy", "conf", "cls"}, ...]``.
+
+    Runs the frozen detector ONCE at ``imgsz``. Boxes come back in the frame's own
+    pixel space, which is the same space pose runs in (same fixed camera), so no
+    rescaling is needed downstream. Holds are sorted top→bottom, left→right so the
+    map indices are stable across runs.
+    """
+    from ultralytics import YOLO  # heavy; imported lazily so the module stays importable
+
+    if not empty_frame.is_file():
+        raise FileNotFoundError(f"Empty-wall frame not found: {empty_frame}")
+    if not weights.is_file():
+        raise FileNotFoundError(f"Detector weights not found: {weights}")
+
+    result = YOLO(str(weights)).predict(str(empty_frame), imgsz=imgsz, conf=conf, verbose=False)[0]
+    holds = [
+        {
+            "xyxy": [round(float(v), 1) for v in box.xyxy[0].tolist()],
+            "conf": round(float(box.conf[0]), 4),
+            "cls": int(box.cls[0]),
+        }
+        for box in result.boxes
+    ]
+    holds.sort(key=lambda h: (h["xyxy"][1], h["xyxy"][0]))  # stable top→bottom, left→right
+    return holds
 
 
 def run(cfg: dict, paths: Paths, empty_frame: Path, out: Path) -> Path:
