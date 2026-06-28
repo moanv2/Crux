@@ -76,7 +76,10 @@ training:
   patience: 20                   # early-stop patience
   seed: 42
 
-# ── Pipeline thresholds (owned by Coder 2 — climbing-coach analysis) ─────────
+# ── Pipeline thresholds (owned by Coder 2 — hold-in-use + reach) ─────────────
 pipeline:
   association_margin_px: 15      # expand hold box by this margin for the contact test
   min_contact_frames: 3          # consecutive frames a keypoint must sit in a box
+  # Empty-wall reference is synthesized from the clip when run.py gets no --empty:
+  empty_frame_samples: 80        # frames sampled across the clip, median'd into an empty wall
+  stabilize_max_features: 2000   # ORB features used to register frames (cancels camera drift)
