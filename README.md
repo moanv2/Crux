@@ -75,7 +75,7 @@ README.md
 | **Diego** | Data | Dataset | Clean single-class YOLO dataset + data card |
 | Jan | Model | Fine-tuned detector | Frozen weights + the graded notebook core |
 | Ignacio | Integration | Climbing-coach pipeline + demo | Working pipeline + rendered debrief demo + fallback |
-| Claudia | Narrative | Story half of deck | Intro/motivation slides + demo script |
+| Claudia | Narrative | Story half of deck + presentation | Intro/motivation slides + demo script + full 10-min presentation structure & speaker script |
 | Dalton | Results / Docs | Results half + notebook docs | Results slides + clean README + assembled deck |
 
 ### Diego: Data
@@ -108,6 +108,12 @@ wall). Degrades gracefully: still shows hold map + skeleton if analysis is noisy
 Problem framing ("a debrief you can't see yourself") and high-level method
 narrative (transfer learning + pose fusion); intro/motivation/approach slides and
 the live-demo script. Coordinates demo timing with Ignacio.
+
+Owns the full presentation layer: defined the 10-minute deck structure (live demo
+cold open → problem → system overview → data → model → integration → results →
+conclusions), wrote the per-slide Gamma prompts, and authored the word-for-word
+speaker script divided across all five presenters. Presents slides 2–3 (problem
+framing + system architecture walkthrough).
 
 ### Dalton: Results / Docs
 Turns Jan's metrics into results slides (mAP, PR curve, before/after, sample
