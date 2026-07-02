@@ -38,6 +38,27 @@ each frame       --> Pose model (pretrained, per frame) --> 17 keypoints -------
 ```
 Both models run on the same 640 image, so outputs share pixel space — no alignment.
 
+## Results
+Measured on the held-out **test** split.
+
+| Model | mAP50 | mAP50-95 |
+|---|---|---|
+| COCO-pretrained (baseline) | 0.0077 | 0.0038 |
+| Fine-tuned (`best.pt`) | 0.8234 | 0.4898 |
+| **Δ (gain)** | **+0.8156** | **+0.4860** |
+
+A single-class YOLO26 fine-tuned on ~425 images takes mAP50 from essentially zero
+(COCO has no `hold` class) to 0.82, confirming the detector generalizes to real
+climbing walls rather than overfitting the training set.
+
+## Run
+```bash
+python pipeline/run.py --empty demo/empty.jpg --clip demo/climb.mp4 --out demo/out.mp4
+```
+Runs the hold detector once on the empty-wall frame, then pose + analysis per
+frame on the climbing clip, and renders the debrief overlay to `demo/out.mp4`.
+Thresholds (association margin, min contact frames) come from `config.yaml`.
+
 ## Scope
 - **In:** single-class hold detection (fine-tuned, graded core); pretrained pose
   overlay; **climb analysis** = contacts (holds used + order), crux via
@@ -75,7 +96,7 @@ README.md
 | **Diego** | Data | Dataset | Clean single-class YOLO dataset + data card |
 | Jan | Model | Fine-tuned detector | Frozen weights + the graded notebook core |
 | Ignacio | Integration | Climbing-coach pipeline + demo | Working pipeline + rendered debrief demo + fallback |
-| Claudia | Narrative | Story half of deck + presentation | Intro/motivation slides + demo script + full 10-min presentation structure & speaker script |
+| Claudia | Narrative | Problem framing + method narrative | Intro/motivation slides + demo script |
 | Dalton | Results / Docs | Results half + notebook docs | Results slides + clean README + assembled deck |
 
 ### Diego: Data
@@ -108,12 +129,6 @@ wall). Degrades gracefully: still shows hold map + skeleton if analysis is noisy
 Problem framing ("a debrief you can't see yourself") and high-level method
 narrative (transfer learning + pose fusion); intro/motivation/approach slides and
 the live-demo script. Coordinates demo timing with Ignacio.
-
-Owns the full presentation layer: defined the 10-minute deck structure (live demo
-cold open → problem → system overview → data → model → integration → results →
-conclusions), wrote the per-slide Gamma prompts, and authored the word-for-word
-speaker script divided across all five presenters. Presents slides 2–3 (problem
-framing + system architecture walkthrough).
 
 ### Dalton: Results / Docs
 Turns Jan's metrics into results slides (mAP, PR curve, before/after, sample
